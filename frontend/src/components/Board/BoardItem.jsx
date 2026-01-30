@@ -11,6 +11,7 @@ function BoardItem({ board, isSelected, onClick }) {
     const { boardDispatch } = useContext(BoardContext);
     const { userToken } = useContext(TokenContext);
     const [isEditing, setIsEditing] = useState(false);
+    const [editedTitle, setEditedTitle] = useState(board.title);
 
     const handleDelete = async (e) => {
         e.stopPropagation();
@@ -28,6 +29,23 @@ function BoardItem({ board, isSelected, onClick }) {
         }
     };
 
+    const handleEditSave = async (e) => {
+        e.stopPropagation();
+        try {
+            const res = await axios.put(
+                `/board/${board._id}`,
+                { title: editedTitle },
+                { headers: { Authorization: `Bearer ${userToken}` } }
+            );
+            boardDispatch({ type: 'UPDATE_BOARD', payload: res.data });
+            setIsEditing(false);
+            toast.success('Board title updated!');
+        } catch (err) {
+            toast.error('Failed to update board');
+            console.error(err);
+        }
+    };
+
     return (
         <div
             className={`board-item ${isSelected ? 'selected' : ''}`}
@@ -36,22 +54,36 @@ function BoardItem({ board, isSelected, onClick }) {
         >
             <div className="board-item-content">
                 <div className="board-item-header">
-                    <h3>{board.title}</h3>
-                    <div className="board-item-actions">
-                        <EditIcon
-                            className="icon-btn"
-                            fontSize="small"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsEditing(true);
-                            }}
-                        />
-                        <DeleteIcon
-                            className="icon-btn delete"
-                            fontSize="small"
-                            onClick={handleDelete}
-                        />
-                    </div>
+                    {isEditing ? (
+                        <>
+                            <input
+                                type="text"
+                                value={editedTitle}
+                                onChange={(e) => setEditedTitle(e.target.value)}
+                            />
+                            <button onClick={handleEditSave}>Save</button>
+                            <button onClick={(e) => { e.stopPropagation(); setIsEditing(false); }}>Cancel</button>
+                        </>
+                    ) : (
+                        <>
+                            <h3>{board.title}</h3>
+                            <div className="board-item-actions">
+                                <EditIcon
+                                    className="icon-btn"
+                                    fontSize="small"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsEditing(true);
+                                    }}
+                                />
+                                <DeleteIcon
+                                    className="icon-btn delete"
+                                    fontSize="small"
+                                    onClick={handleDelete}
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
                 <p className="board-item-stats">
                     {board.taskCount || 0} tasks · {board.completedCount || 0} completed
