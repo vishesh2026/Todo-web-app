@@ -16,8 +16,11 @@ const port = process.env.PORT || 8000;
 // Middlewares
 app.use(express.json());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
+  origin: [
+    "http://localhost:3000",
+    "https://todo-web-app-git-main-vishesh2026s-projects.vercel.app",
+  ],
+  credentials: true,
 }));
 
 // Request logging middleware (development)
