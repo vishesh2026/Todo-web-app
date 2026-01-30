@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || "https://todo-web-app-750s.onrender.com"
+    baseURL: process.env.REACT_APP_API_BASE_URL || "https://todo-web-app-750s.onrender.com/api"
 });
 
 export default instance;
